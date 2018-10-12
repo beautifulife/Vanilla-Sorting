@@ -17,9 +17,9 @@ $ yarn dev (or npm run dev)
 # visit http://localhost:8080
 ```
 
-HTML 수정: `index.ejs`를 수정하시면 됩니다.
-JS 수정: `/app/index.js`를 수정하시면 됩니다.
-CSS 수정: `/assets/styles/index.scss`를 수정하시면 됩니다.
+- HTML 수정: `index.ejs`를 수정하시면 됩니다.
+- JS 수정: `/app/index.js`를 수정하시면 됩니다.
+- CSS 수정: `/assets/styles/index.scss`를 수정하시면 됩니다.
 
 ## TODO
 
