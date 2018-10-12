@@ -66,7 +66,7 @@ module.exports = {
 
             // CSS / SASS
             {
-                test: /\.scss/,
+                test: /\.scss$/,
                 use: [
                     'style-loader',
                     {
@@ -77,6 +77,26 @@ module.exports = {
                     },
                     {
                         loader: 'sass-loader',
+                        options: {
+                            sourceMap: IS_DEV,
+                            includePaths: [dirAssets]
+                        }
+                    }
+                ]
+            },
+
+            {
+                test: /\.less$/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: IS_DEV
+                        }
+                    },
+                    {
+                        loader: 'less-loader',
                         options: {
                             sourceMap: IS_DEV,
                             includePaths: [dirAssets]
