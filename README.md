@@ -17,6 +17,10 @@ $ yarn dev (or npm run dev)
 # visit http://localhost:8080
 ```
 
+HTML 수정: `index.ejs`를 수정하시면 됩니다.
+JS 수정: `/app/index.js`를 수정하시면 됩니다.
+CSS 수정: `/assets/styles/index.scss`를 수정하시면 됩니다.
+
 ## TODO
 
 4가지 정렬 알고리즘의 구동 방식을 시각적으로 확인할 수 있도록 표현해야 합니다. 그리고 아래의 조건이 충족되어야 합니다.
