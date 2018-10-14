@@ -1,10 +1,10 @@
 {
-  "name": "assignment-boilerplate",
+  "name": "vanilla-sorting",
   "version": "1.0.0",
-  "description": "Assignment Boilerplate",
+  "description": "Vanilla Sorting",
   "author": "Ken Huh <ken@vanillacoding.co>",
   "license": "MIT",
-  "homepage": "https://github.com/vanilla-coding/assignment-boilerplate",
+  "homepage": "https://github.com/vanilla-coding/vanilla-sorting",
   "scripts": {
     "dev": "cross-env NODE_ENV=dev webpack-dev-server --progress --mode development --config webpack.config.dev.js"
   },
