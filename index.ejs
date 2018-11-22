@@ -7,7 +7,41 @@
 </head>
 <body>
     <div class="content">
-        <h1>Boilerplate</h1>
+        <div class="header">
+            <div class="subject">
+                <h1>You Don't Know SA<br>(Sorting Algorithm)</h1>
+                <span>Made By Beautifulife</span>
+            </div>
+            <div class="explain">
+                <p>1. 숫자를 입력하세요 (최소 5개 ~ 10개)</p>
+                <p>2. 원하는 정렬방식을 선택하세요 (제시된 4개 중 선택)</p>
+                <p>3. 실행버튼을 눌러 정렬을 실행하세요</p>
+            </div>
+        </div>
+        <div class="main">
+            <div class="select">
+                <div class="input_box">
+                    <input type="text" id="number_input" placeholder="type your number">
+                </div>
+                <div class="selected_number"></div>
+                <div class="select_argorithm">
+                    <button class="argorithm">Bubble Sort</button>
+                    <button class="argorithm">Insertion Sort</button>
+                    <button class="argorithm">Merge Sort</button>
+                    <button class="argorithm">Selection Sort</button>
+                </div>
+                <div class="start_sorting">
+                    <a href="#frame"><button id="start_sorting">Let's get it</button></a>
+                    <button id="refresh_sorting">refresh my sort!</button>
+                </div>
+            </div>
+            <div class="frame" id="frame">
+                Sorting is Here!
+                <div class="statistic"></div>
+                <div class="play_frame">
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
