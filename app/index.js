@@ -53,7 +53,7 @@ function refreshAll(ev) {
 function addInputNumber(ev) {
   if (ev.code === 'Enter') {
     if (inputNumbers.length < 10) {
-      if ((ev.currentTarget.value !== "") && (ev.currentTarget.value !== undefined)) {
+      if ((ev.currentTarget.value !== '') && (ev.currentTarget.value !== undefined)) {
         inputNumbers.push(Number(ev.currentTarget.value));
         addNumberList(ev.currentTarget.value);
         numberInput.value = '';
@@ -121,90 +121,73 @@ function startVisualize(ev) {
 }
 
 function selectionSort(numberArray) {
-  timer = 1;
   for (let i = 0; i < numberArray.length - 1; i++) {
     let minimumNum = i;
+    let saveMinimum = minimumNum
 
-    for (let j = i; j < numberArray.length; j++) {
+    timeOuts.push(setTimeout(() => selectMinimumTimeOut(saveMinimum), 1000 * timer));
+    timer++;
+
+    for (let j = i + 1; j < numberArray.length; j++) {
       let saveData = numberArray.slice();
       let saveMinimum = minimumNum;
-      
-      timeOuts.push(setTimeout(() => selectionTimeOut(saveData, j, i, saveMinimum), 1000 * timer));
+
+      timeOuts.push(setTimeout(() => changeMinimumTimeOut(saveData, saveMinimum, j), 1000 * timer));
+      timer++;
 
       if (numberArray[minimumNum] > numberArray[j]) {
         minimumNum = j;
       }
-
-      timer++;
     }
+
+    timeOuts.push(setTimeout(() => changePositionTimeOut(minimumNum, i), 1000 * timer));
+    timer++;
 
     if (minimumNum !== i) {
       swap(numberArray, minimumNum, i);
     }
   }
+
+  timeOuts.push(setTimeout(() => finalPhase(), 1000 * timer));
 }
 
-function selectionTimeOut(saveData, index, iterationIndex, minimumNum) {
-  debugger;
-  let bars = document.getElementsByClassName('bars');
-  let saveIterationIndex = iterationIndex;
-  let saveIndex = index;
-  let saveMinimum = minimumNum;
-  let lastMinimum = false;
+function selectMinimumTimeOut(minimumNum) {
+  const bars = document.getElementsByClassName('bars');
 
-  if (iterationIndex !== index - 1 && index !== 0) {
-    bars[index - 1].style.backgroundColor = '';
-  }
+  bars[minimumNum].style.backgroundColor = 'paleturquoise';
+  bars[minimumNum].style.borderColor = 'red';
+}
 
-  for (let i = 0; i < bars.length; i++) {
-    if (iterationIndex === index) {
-      bars[i].style.backgroundColor = '';
-      bars[i].style.borderColor = 'black';
+function changeMinimumTimeOut(data, minimumNum, index) {
+  const bars = document.getElementsByClassName('bars');
+
+  bars[index].style.backgroundColor = 'rgba(175, 238, 238, 0.3)';
+
+  timeOuts.push(setTimeout(() => {
+    if (data[minimumNum] > data[index]) {
+      bars[minimumNum].style.borderColor = '';
+      bars[index].style.borderColor = 'red';
     }
-  }
-  
-  if (saveIndex === iterationIndex) {
-    bars[iterationIndex].style.backgroundColor = 'paleturquoise';
-    bars[iterationIndex].style.borderColor = 'red';
+
+    bars[index].style.backgroundColor = '';
+  }, 500));
+}
+
+
+function changePositionTimeOut(minimumNum, iterationIndex) {
+  const bars = document.getElementsByClassName('bars');
+
+  if (minimumNum !== iterationIndex) {
+    bars[iterationIndex].parentNode.insertBefore(bars[minimumNum], bars[iterationIndex]);
+    bars[iterationIndex].parentNode.insertBefore(bars[iterationIndex + 1], bars[minimumNum + 1]);
+
+    timeOuts.push(setTimeout(() => {
+      bars[iterationIndex].style.borderColor = '';
+      bars[minimumNum].style.backgroundColor = '';
+    }, 500));
   } else {
-    bars[index].style.backgroundColor = 'rgba(175, 238, 238, 0.3)';
-  }
-
-  if (saveData[minimumNum] > saveData[index]) {
-    debugger;
-    timeOuts.push(setTimeout(() => changeMinimum(bars, saveIndex, saveMinimum), 400));
-    if (index === saveData.length - 1) {
-      lastMinimum = true;
-    }
-  }
-
-  function changeMinimum(bars, index, minimumNum) {
-    bars[minimumNum].style.borderColor = 'black';
-    bars[index].style.borderColor = 'red';
-  }
-
-  if (index === saveData.length-1) {
-    if (minimumNum !== iterationIndex) {
-      timeOuts.push(setTimeout(() => changeBars(bars, saveIterationIndex, saveMinimum, lastMinimum), 600));
-    } else {
-      bars[minimumNum].style.borderColor = 'black';
-      bars[iterationIndex].style.backgroundColor = '';
-    }
-  }
-
-  function changeBars (bars, iterationIndex, minimumNum, lastMinimum) {
-    if (lastMinimum) {
-      minimumNum++;
-    }
-
-    bars[bars.length - 1].style.backgroundColor = '';
     bars[iterationIndex].style.backgroundColor = '';
-    bars[minimumNum].parentNode.insertBefore(bars[minimumNum], bars[iterationIndex]);
-    bars[minimumNum].parentNode.insertBefore(bars[iterationIndex + 1], bars[minimumNum+1]);
-  }
-
-  if (iterationIndex === saveData.length - 2 && index === saveData.length - 1) {
-    finalPhase(bars);
+    bars[iterationIndex].style.borderColor = '';
   }
 }
 
@@ -225,6 +208,7 @@ function mergeSort(numberArray) {
 }
 
 function mergeArray(left, right) {
+  const bars = document.getElementsByClassName('bars');
   let result = [];
   let leftIndex = 0;
   let rightIndex = 0;
@@ -269,6 +253,11 @@ function mergeArray(left, right) {
 
   timeOuts.push(setTimeout((() => rollBackTimeOut()), 1000 * timer));
   timer++;
+
+  if (result.length === bars.length) {
+    timeOuts.push(setTimeout((() => { finalPhase(); }), 1000 * timer));
+  }
+
   return result;
 }
 
@@ -366,7 +355,7 @@ function changeValueTimeOut(iterationIndex, index) {
   bars[index].style.top = '60px';
 
   if (iterationIndex === bars.length - 1) {
-    timeOuts.push(setTimeout((() => { finalPhase(bars); }), 1000));
+    timeOuts.push(setTimeout((() => { finalPhase(); }), 1000));
   }
 }
 
@@ -376,7 +365,7 @@ function bubbleSort(numberArray) {
     for (let j = 0; j < numberArray.length - 1; j++) {
       let saveData = numberArray.slice();
 
-      timeOuts.push(setTimeout(() =>  bubbleTimeOut(saveData, j, i), 1000 * timer));
+      timeOuts.push(setTimeout(() =>  bubbleTimeOut(saveData, j, i), 800 * timer));
       timer++;
 
       if (numberArray[j] > numberArray[j + 1]) {
@@ -387,7 +376,7 @@ function bubbleSort(numberArray) {
 }
 
 function bubbleTimeOut(saveData, index, iterationIndex) {
-  let bars = document.getElementsByClassName('bars');
+  const bars = document.getElementsByClassName('bars');
   let saveIndex = index;
 
   if (index !== 0) {
@@ -401,7 +390,7 @@ function bubbleTimeOut(saveData, index, iterationIndex) {
   bars[index + 1].style.backgroundColor = 'rgba(175, 238, 238, 0.3)';
 
   if (saveData[index] > saveData[index + 1]) {
-    timeOuts.push(setTimeout(() => changeBars(bars, saveIndex), 600));
+    timeOuts.push(setTimeout(() => changeBars(bars, saveIndex), 500));
   }
 
   function changeBars (bars, index) {
@@ -409,42 +398,43 @@ function bubbleTimeOut(saveData, index, iterationIndex) {
   }
 
   if (iterationIndex === bars.length - 1 && index === bars.length - 2) {
-    finalPhase(bars);
+    timeOuts.push(setTimeout(() => finalPhase(), 1000));
   }
 }
 
-function finalPhase(elements) {
+function finalPhase() {
+  const bars = document.getElementsByClassName('bars');
   let timer = 1;
 
-  for (let i = 0; i < elements.length; i++) {
+  for (let i = 0; i < bars.length; i++) {
     timeOuts.push(setTimeout(() => {
       if (i !== 0) {
-        elements[i - 1].style.backgroundColor = '';
-        elements[i].style.backgroundColor = 'paleturquoise';
+        bars[i - 1].style.backgroundColor = '';
+        bars[i].style.backgroundColor = 'paleturquoise';
       } else {
-        elements[elements.length - 1].style.backgroundColor = '';
-        elements[elements.length - 2].style.backgroundColor = '';
-        elements[i].style.backgroundColor = 'paleturquoise';
+        bars[bars.length - 1].style.backgroundColor = '';
+        bars[bars.length - 2].style.backgroundColor = '';
+        bars[i].style.backgroundColor = 'paleturquoise';
       }
 
-      if (i === elements.length - 1) {
-        lastBlink(true, elements);
+      if (i === bars.length - 1) {
+        lastBlink(true, bars);
       }
-    }, 200 * timer));
+    }, 150 * timer));
 
     timer++;
   }
 
-  function lastBlink(final, elements) {
+  function lastBlink(final, bars) {
     timeOuts.push(setTimeout(() => {
       if (final) {
-        for (let j = 0; j < elements.length; j++) {
-          elements[j].style.backgroundColor = '';
-          lastBlink(false, elements);
+        for (let j = 0; j < bars.length; j++) {
+          bars[j].style.backgroundColor = '';
+          lastBlink(false, bars);
         }
       } else {
-        for (let j = 0; j < elements.length; j++) {
-          elements[j].style.backgroundColor = 'paleturquoise';
+        for (let j = 0; j < bars.length; j++) {
+          bars[j].style.backgroundColor = 'paleturquoise';
         }
       }
     }, 300));

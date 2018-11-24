@@ -57,11 +57,10 @@ li.bars {
     margin: 10px;
     padding: 10px;
     height: 170px;
+    text-align: center;
 }
 
 .subject {
-    position: absolute;
-    left: 200px;
     margin: 0px auto;
     width: 400px;
     height: 150px;
@@ -70,16 +69,6 @@ li.bars {
     cursor: pointer;
 }
 
-.explain {
-    position: absolute;
-    right: 130px;
-    top: 20px;
-    margin: 0px auto;
-    padding: 10px;
-    width: 500px;
-    height: 150px;
-    border: none;
-}
 
 .main {
     margin: 10px;
@@ -88,13 +77,24 @@ li.bars {
 
 .select {
     position: relative;
-    margin: 0px auto;
+    margin-bottom: 10px;
     height: 160px;
+}
+
+.explain {
+    position: absolute;
+    left: 20px;
+    top: 10px;
+    margin: 0px auto;
+    padding: 10px;
+    width: 500px;
+    height: 150px;
+    border: none;
 }
 
 .input_box {
     position: absolute;
-    left: 160px;
+    left: 440px;
     top: 10px;
     padding: 5px;
     width: 450px;
@@ -113,11 +113,11 @@ li.bars {
 
 .selected_number {
     position: absolute;
-    left: 160px;
+    left: 515px;
     top: 50px;
     margin: 5px auto;
     padding: 10px;
-    width: 450px;
+    width: 300px;
     height: 91px;
     line-height: 13px;
     text-align: center;
@@ -135,7 +135,7 @@ li.bars {
 
 .select_argorithm {
     position: absolute;
-    right: 230px;
+    right: 40px;
     top: 10px;
     width: 400px;
     height: 80px;
@@ -146,7 +146,7 @@ li.bars {
 .argorithm {
     border: 1px solid black;
     border-radius: 0.5em;
-    margin: 8px 5px;
+    margin: 8px 10px;
     padding: 2px;
     height: auto;
     width: 160px;
@@ -155,7 +155,7 @@ li.bars {
 
 .start_sorting {
     position: absolute;
-    right: 230px;
+    right: 40px;
     top: 105px;
     width: 400px;
     text-align: center;
@@ -164,7 +164,7 @@ li.bars {
 
 #start_sorting {
     display: inline-block;
-    margin: 10px 5px;
+    margin: 10px 10px;
     padding: 2px;
     border: 2px solid black;
     border-radius: 0.5em;
@@ -175,7 +175,7 @@ li.bars {
 
 #refresh_sorting {
     display: inline-block;
-    margin: 10px 5px;
+    margin: 10px 10px;
     padding: 2px;
     border: 2px solid black;
     border-radius: 0.5em;
@@ -184,23 +184,9 @@ li.bars {
     text-align: center;
 }
 
-.frame {
-    margin: 10px auto;
-    padding: 10px;
-    text-align: center;
-}
-
-.statistic {
-    margin: 10px auto;
-    width: 90%;
-    height: 40px;
-    line-height: 40px;
-}
-
 .play_frame {
     position: relative;
-    margin: auto;
-    width: 90%;
+    padding: 10px;
     height: 500px;
     text-align: center;
 }
