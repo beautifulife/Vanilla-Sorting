@@ -14,7 +14,6 @@ const startButton = document.getElementById('start_sorting');
 const refreshButton = document.getElementById('refresh_sorting');
 const playFrame = document.getElementsByClassName('play_frame')[0];
 
-let typedCharacter = '';
 let inputNumbers = [];
 let argorithm = '';
 let timeOuts = [];
@@ -185,7 +184,6 @@ function selectionTimeOut(saveData, index, iterationIndex, minimumNum) {
   }
 
   if (index === saveData.length-1) {
-    debugger;
     if (minimumNum !== iterationIndex) {
       timeOuts.push(setTimeout(() => changeBars(bars, saveIterationIndex, saveMinimum, lastMinimum), 600));
     } else {
@@ -211,16 +209,111 @@ function selectionTimeOut(saveData, index, iterationIndex, minimumNum) {
 }
 
 function mergeSort(numberArray) {
-  if (numberArray.length === 1) {
+  const saveLength = numberArray.length;
+  if (saveLength === 1) {
     return numberArray;
   }
 
-  let midNum = Math.floor(numberArray.length / 2);
-
-  let left = numberArray.slice(0, midNum);
-  let right = numberArray.slice(minNum, numberArray.length);
+  // const saveData = numberArray.slice();
+  const midNum = Math.floor(saveLength / 2);
+  const left = numberArray.slice(0, midNum);
+  const right = numberArray.slice(midNum);
+  timeOuts.push(setTimeout((() => divideTimeOut(left, saveLength, midNum)), 1000 * timer));
+  timer++;
 
   return mergeArray(mergeSort(left), mergeSort(right));
+}
+
+function mergeArray(left, right) {
+  let result = [];
+  let leftIndex = 0;
+  let rightIndex = 0;
+  let saveLeft = left.slice();
+  let saveRight = right.slice();
+
+  while (leftIndex < left.length && rightIndex < right.length) {
+    if (left[leftIndex] < right[rightIndex]) {
+      let saveIndex = leftIndex;
+      let saveOppsite = rightIndex;
+      timeOuts.push(setTimeout((() => mergeTimeOut(saveLeft[saveIndex], saveRight, saveOppsite)), 1000 * timer));
+      timer++;
+      result.push(left[leftIndex]);
+      leftIndex++;
+    } else {
+      let saveIndex = rightIndex;
+      let saveOppsite = leftIndex;
+      timeOuts.push(setTimeout((() => mergeTimeOut(saveRight[saveIndex], saveLeft, saveOppsite)), 1000 * timer));
+      timer++;
+      result.push(right[rightIndex]);
+      rightIndex++;
+    }
+  }
+
+  while (leftIndex < left.length) {
+    let saveIndex = leftIndex;
+    let saveOppsite = rightIndex;
+    timeOuts.push(setTimeout((() => mergeTimeOut(saveLeft[saveIndex], saveRight, saveOppsite)), 1000 * timer));
+    timer++;
+    result.push(left[leftIndex]);
+    leftIndex++;
+  }
+
+  while (rightIndex < right.length) {
+    let saveIndex = rightIndex;
+    let saveOppsite = leftIndex;
+    timeOuts.push(setTimeout((() => mergeTimeOut(saveRight[saveIndex], saveLeft, saveOppsite)), 1000 * timer));
+    timer++;
+    result.push(right[rightIndex]);
+    rightIndex++;
+  }
+
+  timeOuts.push(setTimeout((() => rollBackTimeOut()), 1000 * timer));
+  timer++;
+  return result;
+}
+
+function rollBackTimeOut() {
+  const bars = document.getElementsByClassName('bars');
+
+  for (let i = 0; i < bars.length; i++) {
+    bars[i].style.top = '60px';
+  }
+}
+
+function mergeTimeOut(value, opposite, oppositeIndex) {
+  debugger;
+  const bars = document.getElementsByClassName('bars');
+  let target;
+
+  if (opposite[oppositeIndex] !== undefined) {
+    for (let i = 0; i < bars.length; i++) {
+      if (opposite[oppositeIndex] === Number(bars[i].textContent)) {
+        target = bars[i];
+      }
+    }
+  }
+
+  for (let i = 0; i < bars.length; i++) {
+    if (value === Number(bars[i].textContent)) {
+      bars[i].style.marginRight = '5px';
+      bars[i].style.marginLeft = '5px';
+      bars[i].style.top = '250px';
+      if (target !== undefined) {
+        bars[i].parentNode.insertBefore(bars[i], target);
+      }
+    }
+  }
+}
+
+function divideTimeOut(left, length, mid) {
+  const bars = document.getElementsByClassName('bars');
+
+  for (let i = 0; i < bars.length; i++) {
+    if (left[left.length-1] === Number(bars[i].textContent)) {
+      bars[i].style.marginRight = '20px';
+      bars[i + 1].style.marginLeft = '20px';
+    }
+  }
 }
 
 function insertionSort(numberArray) {
@@ -228,9 +321,10 @@ function insertionSort(numberArray) {
     let saveData = numberArray.slice();
     let currentValue = numberArray[i];
     let saveIndex;
+
     timeOuts.push(setTimeout((() => saveValueTimeOut(i, saveData)), 800 * timer));
     timer++;
-    
+
     for (let j = i - 1; j > -1 && numberArray[j] > currentValue; j--) {
       timeOuts.push(setTimeout((() => changeSeqTimeOut(i,j)), 800 * timer));
       timer++;
@@ -336,7 +430,7 @@ function finalPhase(elements) {
       if (i === elements.length - 1) {
         lastBlink(true, elements);
       }
-    }, 100 * timer));
+    }, 200 * timer));
 
     timer++;
   }
@@ -353,7 +447,7 @@ function finalPhase(elements) {
           elements[j].style.backgroundColor = 'paleturquoise';
         }
       }
-    }, 500));
+    }, 300));
   }
 }
 
