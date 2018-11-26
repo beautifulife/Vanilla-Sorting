@@ -103,7 +103,6 @@ function selectArgorithm(ev) {
   argorithm = ev.target.textContent;
 }
 
-
 function startVisualize(ev) {
   if (!(inputNumbers.length < 5) && argorithm !== '') {
     if (running === false) {
@@ -307,6 +306,7 @@ function mergeArray(left, right) {
 
   while (leftIndex < left.length && rightIndex < right.length) {
     let saveResult;
+
     if (left[leftIndex] < right[rightIndex]) {
       result.push(left[leftIndex]);
       leftIndex++;
