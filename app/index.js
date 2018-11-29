@@ -18,10 +18,11 @@ const bubbleGap = 600;
 const insertionGap = 600;
 const mergeGap = 1000;
 const selectionGap = 800;
+const quickGap = 800;
 let inputNumbers = [];
-let argorithm = '';
+let argorithmName = '';
 let timer = 1;
-let running = false;
+let isRunning = false;
 
 numberInput.addEventListener('keydown', addInputNumber);
 argorithmParent.addEventListener('click', selectArgorithm);
@@ -31,9 +32,9 @@ refreshButton.addEventListener('click', refreshAll);
 function refreshAll(ev) {
   inputNumbers = [];
   timer = [];
-  argorithm = '';
+  argorithmName = '';
   playFrame.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'nearest'});
-  running = false;
+  isRunning = false;
 
   for (let i = 0; i < argorithmButtons.length; i++) {
     if (argorithmButtons[i].classList.contains('active')) {
@@ -87,9 +88,9 @@ function addNumberToList(inputNumber) {
 }
 
 function selectArgorithm(ev) {
-  const eventTarget = ev.target.classList;
+  const classList = ev.target.classList;
 
-  if (eventTarget.contains('select_argorithm')) {
+  if (classList.contains('select_argorithm')) {
     return false;
   }
 
@@ -99,32 +100,34 @@ function selectArgorithm(ev) {
     }
   }
 
-  eventTarget.add('active');
-  argorithm = ev.target.textContent;
+  classList.add('active');
+  argorithmName = ev.target.textContent;
 }
 
 function startVisualize(ev) {
-  if (!(inputNumbers.length < 5) && argorithm !== '') {
-    if (running === false) {
+  if (!(inputNumbers.length < 5) && argorithmName !== '') {
+    if (isRunning === false) {
       const numberArray = inputNumbers.slice();
 
       playFrame.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'nearest'});
       makeBars();
 
-      if (argorithm === 'Bubble Sort') {
+      if (argorithmName === 'Bubble Sort') {
         bubbleSort(numberArray);
-      } else if (argorithm === 'Insertion Sort') {
+      } else if (argorithmName === 'Insertion Sort') {
         insertionSort(numberArray);
-      } else if (argorithm === 'Merge Sort') {
+      } else if (argorithmName === 'Merge Sort') {
         mergeSort(numberArray);
-      } else if (argorithm === 'Selection Sort') {
+      } else if (argorithmName === 'Selection Sort') {
         selectionSort(numberArray);
+      } else if (argorithmName === 'Quick Sort') {
+        quickSort(numberArray);
       }
 
-      running = true;
+      isRunning = true;
     } else {
       timer = [];
-      running = false;
+      isRunning = false;
 
       for (let i = playFrame.children.length - 1; i > -1; i--) {
         playFrame.children[i].remove();
@@ -164,7 +167,7 @@ function bubbleSort(numberArray) {
 
       if (numberArray[j] > numberArray[j + 1]) {
         timeouts.push(setTimeout(() => {
-          bubbleChangeTimeout(j, i);
+          bubbleSwapTimeout(j, i);
         }, bubbleGap * timer));
         timer += 1.2;
         swap(numberArray, j, j + 1);
@@ -189,15 +192,15 @@ function bubbleSelectTimeout(index, iterationIndex) {
   bars[index].style.backgroundColor = 'paleturquoise';
 }
 
-function bubbleChangeTimeout(index, iterationIndex) {
+function bubbleSwapTimeout(index, iterationIndex) {
   const bars = document.getElementsByClassName('bars');
 
   bars[index + 1].style.backgroundColor = 'rgba(175, 238, 238, 0.4)';
   timeouts.push(setTimeout(() => {
-    changeBars(bars, index, iterationIndex);
+    swapBars(bars, index, iterationIndex);
   }, 400));
 
-  function changeBars (bars, index, iterationIndex) {
+  function swapBars (bars, index, iterationIndex) {
     bars[index].parentNode.insertBefore(bars[index + 1], bars[index]);
 
     if (bars.length - 1 - iterationIndex === index + 1) {
@@ -216,13 +219,13 @@ function insertionSort(numberArray) {
     let saveIndex;
 
     timeouts.push(setTimeout(() => {
-      insertionSaveValueTimeout(i, saveData, currentValue);
+      insertionSetColorTimeout(i, saveData, currentValue);
     }, insertionGap * timer));
     timer += 1.5;
 
     for (let j = i - 1; j > -1 && numberArray[j] > currentValue; j--) {
       timeouts.push(setTimeout(() => {
-        insertionChangeSeqTimeout(j);
+        insertionSwapBeforeTimeout(j);
       }, insertionGap * timer));
       timer++;
       numberArray[j + 1] = numberArray[j];
@@ -230,7 +233,7 @@ function insertionSort(numberArray) {
     }
 
     timeouts.push(setTimeout(() => {
-      insertionChangeValueTimeout(saveIndex);
+      insertionRollBackTimeout(saveIndex);
     }, insertionGap * timer));
     timer++;
     numberArray[saveIndex] = currentValue;
@@ -241,7 +244,7 @@ function insertionSort(numberArray) {
   }, insertionGap * timer));
 }
 
-function insertionSaveValueTimeout(iterationIndex, data, currentValue) {
+function insertionSetColorTimeout(iterationIndex, data, currentValue) {
   const bars = document.getElementsByClassName('bars');
   const max = Math.max(...data);
   const barHeight = (data[iterationIndex] * 170 / max) + 65 + 'px';
@@ -259,7 +262,7 @@ function insertionSaveValueTimeout(iterationIndex, data, currentValue) {
   }
 }
 
-function insertionChangeSeqTimeout(index) {
+function insertionSwapBeforeTimeout(index) {
   const bars = document.getElementsByClassName('bars');
 
   bars[index].style.backgroundColor = 'rgba(175, 238, 238, 0.4)';
@@ -269,7 +272,7 @@ function insertionChangeSeqTimeout(index) {
   }, 600));
 }
 
-function insertionChangeValueTimeout(index) {
+function insertionRollBackTimeout(index) {
   const bars = document.getElementsByClassName('bars');
 
   bars[index + 1].style.backgroundColor = '';
@@ -279,67 +282,77 @@ function insertionChangeValueTimeout(index) {
   bars[index].style.top = '60px';
 }
 
-function mergeSort(numberArray) {
+function mergeSort(numberArray, bars) {
   const saveLength = numberArray.length;
 
+  if (bars === undefined) {
+    bars = document.getElementsByClassName('bars');
+  }
+
   if (saveLength === 1) {
-    return numberArray;
+    return [numberArray, bars];
   }
 
   const midNum = Math.floor(saveLength / 2);
   const left = numberArray.slice(0, midNum);
   const right = numberArray.slice(midNum);
+  const barsLeft = Array.prototype.slice.call(bars, 0, midNum);
+  const barsRight = Array.prototype.slice.call(bars, midNum);
 
   timeouts.push(setTimeout(() => {
-    mergeDivideTimeout(left, right);
+    mergeDivideTimeout(barsLeft, barsRight);
   }, mergeGap * timer));
   timer++;
 
-  return mergeArray(mergeSort(left), mergeSort(right));
+  return mergeArray(mergeSort(left, barsLeft), mergeSort(right, barsRight));
 }
 
 function mergeArray(left, right) {
   const bars = document.getElementsByClassName('bars');
-  const result = [];
+  const result = [[],[]];
   let leftIndex = 0;
   let rightIndex = 0;
 
-  while (leftIndex < left.length && rightIndex < right.length) {
+  while (leftIndex < left[0].length && rightIndex < right[0].length) {
     let saveResult;
 
-    if (left[leftIndex] < right[rightIndex]) {
-      result.push(left[leftIndex]);
+    if (left[0][leftIndex] <= right[0][rightIndex]) {
+      result[0].push(left[0][leftIndex]);
+      result[1].push(left[1][leftIndex]);
       leftIndex++;
     } else {
-      result.push(right[rightIndex]);
+      result[0].push(right[0][rightIndex]);
+      result[1].push(right[1][rightIndex]);
       rightIndex++;
     }
 
-    saveResult = result.slice();
+    saveResult = result[1].slice();
     timeouts.push(setTimeout(() => {
-      mergeTimeout(saveResult, left[0]);
+      mergeTimeout(saveResult, left[1][0]);
     }, mergeGap * timer));
     timer++;
   }
 
-  while (leftIndex < left.length) {
+  while (leftIndex < left[0].length) {
     let saveResult;
 
-    result.push(left[leftIndex]);
+    result[0].push(left[0][leftIndex]);
+    result[1].push(left[1][leftIndex]);
     leftIndex++;
-    saveResult = result.slice();
+    saveResult = result[1].slice();
     timeouts.push(setTimeout(() => {
       mergeTimeout(saveResult);
     }, mergeGap * timer));
     timer++;
   }
 
-  while (rightIndex < right.length) {
+  while (rightIndex < right[0].length) {
     let saveResult;
 
-    result.push(right[rightIndex]);
+    result[0].push(right[0][rightIndex]);
+    result[1].push(right[1][rightIndex]);
     rightIndex++;
-    saveResult = result.slice();
+    saveResult = result[1].slice();
     timeouts.push(setTimeout(() => {
       mergeTimeout(saveResult);
     }, mergeGap * timer));
@@ -351,7 +364,7 @@ function mergeArray(left, right) {
   }, mergeGap * timer));
   timer++;
 
-  if (result.length === bars.length) {
+  if (result[0].length === bars.length) {
     timeouts.push(setTimeout(() => {
       finalPhase();
     }, mergeGap * timer));
@@ -360,66 +373,43 @@ function mergeArray(left, right) {
   return result;
 }
 
-function mergeDivideTimeout(left, right) {
-  const bars = document.getElementsByClassName('bars');
+function mergeDivideTimeout(barsLeft, barsRight) {
+  barsLeft[barsLeft.length - 1].style.marginRight = '20px';
+  barsRight[0].style.marginLeft = '20px';
 
-  for (let i = 0; i < bars.length; i++) {
-    if (left[left.length - 1] === Number(bars[i].textContent)) {
-      bars[i].style.marginRight = '20px';
-      bars[i + 1].style.marginLeft = '20px';
-    }
+  for (let i = 0; i < barsLeft.length; i++) {
+    barsLeft[i].style.backgroundColor = 'rgba(175, 238, 238, 0.4)';
+    timeouts.push(setTimeout(() => {
+      barsLeft[i].style.backgroundColor = '';
+    }, 900));
+  }
 
-    for (let j = 0; j < left.length; j++) {
-      if (left[j] === Number(bars[i].textContent)) {
-        bars[i].style.backgroundColor = 'rgba(175, 238, 238, 0.4)';
-        timeouts.push(setTimeout(() => {
-          bars[i].style.backgroundColor = '';
-        }, 900));
-      }
-    }
-
-    for (let j = 0; j < right.length; j++) {
-      if (right[j] === Number(bars[i].textContent)) {
-        bars[i].style.backgroundColor = 'rgba(175, 238, 238, 0.4)';
-        timeouts.push(setTimeout(() => {
-          bars[i].style.backgroundColor = '';
-        }, 900));
-      }
-    }
+  for (let i = 0; i < barsRight.length; i++) {
+    barsRight[i].style.backgroundColor = 'rgba(175, 238, 238, 0.4)';
+    timeouts.push(setTimeout(() => {
+      barsRight[i].style.backgroundColor = '';
+    }, 900));
   }
 }
 
-function mergeTimeout(resultArray, leftFirst) {
-  const bars = document.getElementsByClassName('bars');
+function mergeTimeout(result, leftFirst) {
   let target;
 
-  if (resultArray.length === 1) {
-    for (let i = 0; i < bars.length; i++) {
-      if (leftFirst === Number(bars[i].textContent)) {
-        target = bars[i];
-      }
-    }
+  if (result.length === 1) {
+    target = leftFirst;
   } else {
-    for (let i = 0; i < bars.length; i++) {
-      if (resultArray[resultArray.length - 2] === Number(bars[i].textContent)) {
-        target = bars[i + 1];
-      }
-    }
+    target = result[result.length - 2].nextSibling;
   }
 
-  for (let i = 0; i < bars.length; i++) {
-    if (resultArray[resultArray.length - 1] === Number(bars[i].textContent)) {
-      bars[i].style.backgroundColor = 'paleturquoise';
-      bars[i].style.marginRight = '5px';
-      bars[i].style.marginLeft = '5px';
-      bars[i].style.top = '250px';
+  result[result.length - 1].style.backgroundColor = 'paleturquoise';
+  result[result.length - 1].style.marginRight = '5px';
+  result[result.length - 1].style.marginLeft = '5px';
+  result[result.length - 1].style.top = '250px';
 
-      if (target !== undefined) {
-        timeouts.push(setTimeout(() => {
-          bars[i].parentNode.insertBefore(bars[i], target);
-        }, 500));
-      }
-    }
+  if (target !== undefined) {
+    timeouts.push(setTimeout(() => {
+      result[result.length - 1].parentNode.insertBefore(result[result.length - 1], target);
+    }, 500));
   }
 }
 
@@ -438,7 +428,7 @@ function selectionSort(numberArray) {
     const saveMinimum = minimumNum;
 
     timeouts.push(setTimeout(() => {
-      selectionSelectMinimumTimeout(saveMinimum);
+      selectionSetColorTimeout(saveMinimum);
     }, selectionGap * timer));
     timer++;
 
@@ -447,7 +437,7 @@ function selectionSort(numberArray) {
       const saveMinimum = minimumNum;
 
       timeouts.push(setTimeout(() => {
-        selectionChangeMinimumTimeout(saveData, saveMinimum, j);
+        selectionChangeMinimumColorTimeout(saveData, saveMinimum, j);
       }, selectionGap * timer));
       timer++;
 
@@ -458,7 +448,7 @@ function selectionSort(numberArray) {
 
     timer += 0.7;
     timeouts.push(setTimeout(() => {
-      selectionChangePositionTimeout(minimumNum, i);
+      selectionSwapPositionTimeout(minimumNum, i);
     }, selectionGap * timer));
     timer++;
 
@@ -472,14 +462,14 @@ function selectionSort(numberArray) {
   }, selectionGap * timer));
 }
 
-function selectionSelectMinimumTimeout(minimumNum) {
+function selectionSetColorTimeout(minimumNum) {
   const bars = document.getElementsByClassName('bars');
 
   bars[minimumNum].style.backgroundColor = 'paleturquoise';
   bars[minimumNum].style.border = '2px solid red';
 }
 
-function selectionChangeMinimumTimeout(data, minimumNum, index) {
+function selectionChangeMinimumColorTimeout(data, minimumNum, index) {
   const bars = document.getElementsByClassName('bars');
 
   bars[index].style.backgroundColor = 'rgba(175, 238, 238, 0.4)';
@@ -493,8 +483,7 @@ function selectionChangeMinimumTimeout(data, minimumNum, index) {
   }, 450));
 }
 
-
-function selectionChangePositionTimeout(minimumNum, iterationIndex) {
+function selectionSwapPositionTimeout(minimumNum, iterationIndex) {
   const bars = document.getElementsByClassName('bars');
 
   if (minimumNum !== iterationIndex) {
@@ -507,6 +496,140 @@ function selectionChangePositionTimeout(minimumNum, iterationIndex) {
   } else {
     bars[iterationIndex].style.backgroundColor = '';
     bars[iterationIndex].style.border = '';
+  }
+}
+
+function quickSort(numberArray) {
+  quickSortIteration(numberArray, 0, numberArray.length - 1);
+  timeouts.push(setTimeout(() => {
+    finalPhase();
+  }, quickGap * timer));
+}
+
+function quickSortIteration(numberArray, left, right) {
+  let index;
+
+  if (numberArray.length > 1) {
+    index = quickSortPartition(numberArray, left, right);
+
+    if (index - 1 > left) {
+      quickSortIteration(numberArray, left, index - 1);
+    }
+
+    if (index < right) {
+      quickSortIteration(numberArray, index, right);
+    }
+  }
+}
+
+function quickSortPartition(numberArray, left, right) {
+  const pivot = Math.floor((left + right) / 2);
+  const numberArrayPivot = numberArray[pivot];
+
+  timeouts.push(setTimeout(() => {
+    quickSetPivotColorTimeout(pivot);
+  }, quickGap * timer));
+  timer += 0.2;
+
+  while (left <= right) {
+    const saveLeft = left;
+    const saveRight = right;
+
+    timeouts.push(setTimeout(() => {
+      quickSetIndexColorTimeout(saveLeft, saveRight);
+    }, quickGap * timer));
+    timer++;
+
+    while (numberArrayPivot > numberArray[left]) {
+      const saveLeft = left;
+
+      timeouts.push(setTimeout(() => {
+        quickChangeColorTimeout(saveLeft, 'left');
+      }, quickGap * timer));
+      timer++;
+      left++;
+    }
+
+    while (numberArrayPivot < numberArray[right]) {
+      const saveRight = right;
+
+      timeouts.push(setTimeout(() => {
+        quickChangeColorTimeout(saveRight, 'right');
+      }, quickGap * timer));
+      timer++;
+      right--;
+    }
+
+    if (left <= right) {
+      const saveLeft = left;
+      const saveRight = right;
+
+      timeouts.push(setTimeout(() => {
+        quickSwapBarsTimeout(saveLeft, saveRight);
+      }, quickGap * timer));
+      timer++;
+      swap(numberArray,left,right);
+      left++;
+      right--;
+    }
+  }
+
+  timeouts.push(setTimeout(() => {
+    quickRollBackTimeout();
+  }, quickGap * timer));
+  timer++;
+
+  return left;
+}
+
+function quickSetPivotColorTimeout(pivot) {
+  const bars = document.getElementsByClassName('bars');
+
+  bars[pivot].style.backgroundColor = 'paleturquoise';
+}
+
+function quickSetIndexColorTimeout(left, right) {
+  const bars = document.getElementsByClassName('bars');
+
+  bars[left].style.borderBottom = '10px solid rgba(255, 42, 42, 0.5)';
+  bars[right].style.borderTop = '10px solid rgba(59, 59, 255, 0.5)';
+}
+
+function quickChangeColorTimeout(index, directionString) {
+  const bars = document.getElementsByClassName('bars');
+
+  if (directionString === 'left') {
+    bars[index].style.borderBottom = '';
+    bars[index + 1].style.borderBottom = '10px solid rgba(255, 42, 42, 0.5)';
+  } else {
+    bars[index].style.borderTop = '';
+    bars[index - 1].style.borderTop = '10px solid rgba(59, 59, 255, 0.5)';
+  }
+}
+
+function quickSwapBarsTimeout(left, right) {
+  const bars = document.getElementsByClassName('bars');
+
+  bars[left].parentNode.insertBefore(bars[left], bars[right]);
+  bars[left].parentNode.insertBefore(bars[right], bars[left]);
+
+  bars[left].style.borderTop = '';
+  bars[left].style.borderBottom = '10px solid rgba(255, 42, 42, 0.5)';
+  bars[right].style.borderBottom = '';
+  bars[right].style.borderTop = '10px solid rgba(59, 59, 255, 0.5';
+
+  timeouts.push(setTimeout(() => {
+    bars[left].style.borderBottom = '';
+    bars[right].style.borderTop = '';
+  }, 500));
+}
+
+function quickRollBackTimeout() {
+  const bars = document.getElementsByClassName('bars');
+
+  for (let i = 0; i < bars.length; i++) {
+    bars[i].style.border = '';
+    bars[i].style.backgroundColor = '';
   }
 }
 
