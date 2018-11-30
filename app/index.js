@@ -161,13 +161,13 @@ function bubbleSort(numberArray) {
   for (let i = 0; i < numberArray.length; i++) {
     for (let j = 0; j < numberArray.length - 1 - i; j++) {
       timeouts.push(setTimeout(() => {
-        bubbleSelectTimeout(j, i);
+        bubbleSetColorTimeout(j, i);
       }, bubbleGap * timer));
       timer++;
 
       if (numberArray[j] > numberArray[j + 1]) {
         timeouts.push(setTimeout(() => {
-          bubbleSwapTimeout(j, i);
+          bubbleSwapPositionTimeout(j, i);
         }, bubbleGap * timer));
         timer += 1.2;
         swap(numberArray, j, j + 1);
@@ -180,7 +180,7 @@ function bubbleSort(numberArray) {
   }, bubbleGap * timer));
 }
 
-function bubbleSelectTimeout(index, iterationIndex) {
+function bubbleSetColorTimeout(index, iterationIndex) {
   const bars = document.getElementsByClassName('bars');
 
   if (index === 0) {
@@ -192,7 +192,7 @@ function bubbleSelectTimeout(index, iterationIndex) {
   bars[index].style.backgroundColor = 'paleturquoise';
 }
 
-function bubbleSwapTimeout(index, iterationIndex) {
+function bubbleSwapPositionTimeout(index, iterationIndex) {
   const bars = document.getElementsByClassName('bars');
 
   bars[index + 1].style.backgroundColor = 'rgba(175, 238, 238, 0.4)';
@@ -225,7 +225,7 @@ function insertionSort(numberArray) {
 
     for (let j = i - 1; j > -1 && numberArray[j] > currentValue; j--) {
       timeouts.push(setTimeout(() => {
-        insertionSwapBeforeTimeout(j);
+        insertionSwapPositionTimeout(j);
       }, insertionGap * timer));
       timer++;
       numberArray[j + 1] = numberArray[j];
@@ -262,7 +262,7 @@ function insertionSetColorTimeout(iterationIndex, data, currentValue) {
   }
 }
 
-function insertionSwapBeforeTimeout(index) {
+function insertionSwapPositionTimeout(index) {
   const bars = document.getElementsByClassName('bars');
 
   bars[index].style.backgroundColor = 'rgba(175, 238, 238, 0.4)';
@@ -565,7 +565,7 @@ function quickSortPartition(numberArray, left, right) {
       const saveRight = right;
 
       timeouts.push(setTimeout(() => {
-        quickSwapBarsTimeout(saveLeft, saveRight);
+        quickSwapPositionTimeout(saveLeft, saveRight);
       }, quickGap * timer));
       timer++;
       swap(numberArray,left,right);
@@ -607,7 +607,7 @@ function quickChangeColorTimeout(index, directionString) {
   }
 }
 
-function quickSwapBarsTimeout(left, right) {
+function quickSwapPositionTimeout(left, right) {
   const bars = document.getElementsByClassName('bars');
 
   bars[left].parentNode.insertBefore(bars[left], bars[right]);
